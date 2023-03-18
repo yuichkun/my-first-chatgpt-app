@@ -18,41 +18,11 @@ async function generateResponse(prompt: string) {
   return result.choices[0].message.content;
 }
 
-async function* readLines(): AsyncIterable<string> {
-  const decoder = new TextDecoder();
-  const buffer = new Uint8Array(1024);
-
-  while (true) {
-    const bytesRead = await Deno.stdin.read(buffer);
-    if (bytesRead === null) {
-      break;
-    }
-    const line = decoder.decode(buffer.subarray(0, bytesRead)).trim();
-    if (line) {
-      yield line;
-    }
-  }
-}
-
 async function main() {
-  console.log(
-    "ChatGPTに質問してください (終了するには'q'を入力してください)："
-  );
   let input = "";
-
-  while (input.toLowerCase() !== "q") {
-    Deno.stdout.writeSync(new TextEncoder().encode("質問: "));
-    for await (const line of readLines()) {
-      input = line;
-      break;
-    }
-    if (input && input.toLowerCase() !== "q") {
-      const response = await generateResponse(input);
-      console.log(`回答: ${response}`);
-    }
-  }
-
-  console.log("アプリケーションを終了します。");
+  console.log("Input: ", input);
+  const response = await generateResponse(input);
+  console.log(`Output: ${response}`);
 }
 
 main();
